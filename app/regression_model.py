@@ -84,10 +84,10 @@ def regression_model_pipeline(DF, API_KEY, GPT_MODEL, QUESTION=""):
     '''
     st.success(analysis_str)
 
-    st.subheader("Data Overview")
+    #st.subheader("Data Overview")
     if "data_origin" not in st.session_state:
         st.session_state.data_origin = NEW_DF
-    st.dataframe(st.session_state.data_origin.describe(), width=1200)
+    #st.dataframe(st.session_state.data_origin.describe(), width=1200)
     attributes = st.session_state.data_origin.columns.tolist()
 
     # Select the target variable
@@ -128,13 +128,13 @@ def regression_model_pipeline(DF, API_KEY, GPT_MODEL, QUESTION=""):
     if st.session_state.target_selected:
 
         # Data Imputation
-        st.subheader("Handle and Impute Missing Values")
+        # st.subheader("Handle and Impute Missing Values")
         if "contain_null" not in st.session_state:
             st.session_state.contain_null = contains_missing_value(st.session_state.data_origin)
 
         if "filled_df" not in st.session_state:
             if st.session_state.contain_null:
-                with st.status("Processing **missing values** in the data...", expanded=True) as status:
+                # with st.status("Processing **missing values** in the data...", expanded=True) as status:
                     # st.write("Filtering out high-frequency missing rows and columns...")
                     # filled_df = remove_high_null(NEW_DF)
                     # filled_df = remove_rows_with_empty_target(filled_df, st.session_state.selected_Y)
@@ -148,39 +148,39 @@ def regression_model_pipeline(DF, API_KEY, GPT_MODEL, QUESTION=""):
                     filled_df = NEW_DF.dropna()
                     st.session_state.filled_df = filled_df
                     NEW_DF = filled_df
-                    status.update(label="Missing value processing completed!", state="complete", expanded=False)
-                st.download_button(
-                    label="Download Data with Missing Values Imputed",
-                    data=st.session_state.filled_df.to_csv(index=False).encode("utf-8"),
-                    file_name="imputed_missing_values.csv",
-                    mime="text/csv",
-                )
+                    # status.update(label="Missing value processing completed!", state="complete", expanded=False)
+                # st.download_button(
+                #     label="Download Data with Missing Values Imputed",
+                #     data=st.session_state.filled_df.to_csv(index=False).encode("utf-8"),
+                #     file_name="imputed_missing_values.csv",
+                #     mime="text/csv",
+                # )
             else:
                 st.session_state.filled_df = NEW_DF
-                st.success("No missing values detected. Processing skipped.")
-        else:
-            st.success("Missing value processing completed!")
-            if st.session_state.contain_null:
-                st.download_button(
-                    label="Download Data with Missing Values Imputed",
-                    data=st.session_state.filled_df.to_csv(index=False).encode("utf-8"),
-                    file_name="imputed_missing_values.csv",
-                    mime="text/csv",
-                )
+                # st.success("No missing values detected. Processing skipped.")
+        # else:
+        #     st.success("Missing value processing completed!")
+            # if st.session_state.contain_null:
+                # st.download_button(
+                #     label="Download Data with Missing Values Imputed",
+                #     data=st.session_state.filled_df.to_csv(index=False).encode("utf-8"),
+                #     file_name="imputed_missing_values.csv",
+                #     mime="text/csv",
+                # )
 
         # Data Encoding
-        st.subheader("Process Data Encoding")
-        st.caption(
-            "*For considerations of processing time, **NLP features** like **TF-IDF** have not been included in the current pipeline, long text attributes may be dropped."
-        )
+        # st.subheader("Process Data Encoding")
+        # st.caption(
+        #     "*For considerations of processing time, **NLP features** like **TF-IDF** have not been included in the current pipeline, long text attributes may be dropped."
+        # )
         if "all_numeric" not in st.session_state:
             st.session_state.all_numeric = check_all_columns_numeric(st.session_state.data_origin)
 
         if "encoded_df" not in st.session_state:
             if not st.session_state.all_numeric:
-                with st.status(
-                    "Encoding non-numeric data using **numeric mapping** and **one-hot**...", expanded=True
-                ) as status:
+                # with st.status(
+                #     "Encoding non-numeric data using **numeric mapping** and **one-hot**...", expanded=True
+                # ) as status:
                     non_numeric_attributes, non_numeric_head = non_numeric_columns_and_head(NEW_DF)
                     # NẾU CÓ CỘT SỐ TẦNG VÀ SỐ PHÒNG NGỦ, XỬ LÍ CÁC GIÁ TRỊ 'NHIỀU HƠN 10'
                     for non_numeric_attr in non_numeric_attributes:
@@ -218,7 +218,7 @@ def regression_model_pipeline(DF, API_KEY, GPT_MODEL, QUESTION=""):
                     # encode_result_dict = decide_encode_type(
                     #     non_numeric_attributes, non_numeric_head, GPT_MODEL, API_KEY
                     # )
-                    st.write("Encoding the data...")
+                    # st.write("Encoding the data...")
                     # convert_int_cols, one_hot_cols, drop_cols = separate_decode_list(
                     #     encode_result_dict, st.session_state.selected_Y
                     # )
@@ -234,56 +234,56 @@ def regression_model_pipeline(DF, API_KEY, GPT_MODEL, QUESTION=""):
                     if 'Số phòng ngủ' in NEW_DF.columns.tolist():
                         NEW_DF['Số phòng ngủ'] = NEW_DF['Số phòng ngủ'].astype(int)
                     st.session_state.encoded_df = NEW_DF
-                    status.update(label="Data encoding completed!", state="complete", expanded=False)
-                st.download_button(
-                    label="Download Encoded Data",
-                    data=st.session_state.encoded_df.to_csv(index=False).encode("utf-8"),
-                    file_name="encoded_data.csv",
-                    mime="text/csv",
-                )
+                    # status.update(label="Data encoding completed!", state="complete", expanded=False)
+                # st.download_button(
+                #     label="Download Encoded Data",
+                #     data=st.session_state.encoded_df.to_csv(index=False).encode("utf-8"),
+                #     file_name="encoded_data.csv",
+                #     mime="text/csv",
+                # )
             else:
                 st.session_state.encoded_df = NEW_DF
-                st.success("All columns are numeric. Processing skipped.")
-        else:
-            st.success("Data encoded completed using numeric mapping and one-hot!")
-            if not st.session_state.all_numeric:
-                st.download_button(
-                    label="Download Encoded Data",
-                    data=st.session_state.encoded_df.to_csv(index=False).encode("utf-8"),
-                    file_name="encoded_data.csv",
-                    mime="text/csv",
-                )
+                # st.success("All columns are numeric. Processing skipped.")
+        # else:
+        #     st.success("Data encoded completed using numeric mapping and one-hot!")
+            # if not st.session_state.all_numeric:
+                # st.download_button(
+                #     label="Download Encoded Data",
+                #     data=st.session_state.encoded_df.to_csv(index=False).encode("utf-8"),
+                #     file_name="encoded_data.csv",
+                #     mime="text/csv",
+                # )
         print('NEW_DF lần 2:\n', NEW_DF) # 1 lần
         # Correlation Heatmap
         if "df_cleaned1" not in st.session_state:
             st.session_state.df_cleaned1 = NEW_DF
-        st.subheader("Correlation Between Attributes")
-        st.plotly_chart(correlation_matrix_plotly(st.session_state.df_cleaned1))
+        # st.subheader("Correlation Between Attributes")
+        # st.plotly_chart(correlation_matrix_plotly(st.session_state.df_cleaned1))
 
         # Remove duplicate entities
-        st.subheader("Remove Duplicate Entities")
+        #st.subheader("Remove Duplicate Entities")
         if "df_cleaned2" not in st.session_state:
             # st.session_state.df_cleaned2 = remove_duplicates(st.session_state.df_cleaned1)
             st.session_state.df_cleaned2 = st.session_state.df_cleaned1
             # DF = remove_duplicates(DF)
-        st.info("Duplicate rows removed.")
+        #st.info("Duplicate rows removed.")
 
         # Data Transformation
-        st.subheader("Data Transformation")
+        #st.subheader("Data Transformation")
         if "data_transformed" not in st.session_state:
             # st.session_state.data_transformed = transform_data_for_clustering(st.session_state.df_cleaned2)
             st.session_state.data_transformed = st.session_state.df_cleaned2
         print('data_transformed:\n', st.session_state.data_transformed)
-        st.success("Data transformed by standardization and box-cox if applicable.")
+        #st.success("Data transformed by standardization and box-cox if applicable.")
 
         # PCA
-        st.subheader("Principal Component Analysis")
-        st.write("Deciding whether to perform PCA...")
+        #st.subheader("Principal Component Analysis")
+        #st.write("Deciding whether to perform PCA...")
         if "df_pca" not in st.session_state:
             # _, n_components = decide_pca(st.session_state.df_cleaned2)
             # st.session_state.df_pca = perform_PCA_for_regression(st.session_state.data_transformed, n_components, st.session_state.selected_Y)
             st.session_state.df_pca = st.session_state.data_transformed
-        st.success("Completed!")
+        #st.success("Completed!")
 
         if "start_training" not in st.session_state:
             st.session_state["start_training"] = False
